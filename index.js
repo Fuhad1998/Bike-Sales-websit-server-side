@@ -3,6 +3,10 @@ const app = express()
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
+const product = require('mongodb').ObjectId;
+
+
 const port = process.env.PORT || 5500;
 
 app.use(cors());
@@ -30,7 +34,25 @@ async function run (){
             const products = await cursor.toArray();
             res.send(products)
         })
+            
 
+        // add a product
+
+        app.post('/products', async(req, res)=>{
+            const products = req.body;
+            const result = await productCollection.insertOne(products);
+            res.json(result)
+        })
+
+        // delete products 
+
+        app.delete('/products/:id', async (req, res) =>{
+            const id = req.params.id;
+            const query = {_id: product(id)};
+            const result = await productCollection.deleteOne(query)
+            
+            res.json(result)
+        })
 
         // review post and get
 
@@ -47,18 +69,38 @@ async function run (){
         })
 
         // orders post and get
-
+        // post orders
         app.post('/orders', async(req, res)=>{
             const orders = req.body;
             const result = await orderCollection.insertOne(orders);
             res.json(result)
         })
-
+        // get orders
         app.get('/orders', async (req, res) => {
             const cursor = orderCollection.find({});
             const  orders= await cursor.toArray();
             res.send(orders)
         })
+
+
+        // delete orders
+
+        app.delete('/orders/:id', async (req, res) =>{
+            const id = req.params.id;
+            const query = {_id:ObjectId(id)};
+            const result = await orderCollection.deleteOne(query)
+            
+            res.json(result)
+        })
+        // delete all orders
+
+        // app.delete('/manageAllOrders/:id', async (req, res) =>{
+        //     const id = req.params.id;
+        //     const query = {_id:ObjectId(id)};
+        //     const result = await orderCollection.deleteOne(query)
+            
+        //     res.json(result)
+        // })
 
 
     }
